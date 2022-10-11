@@ -1,6 +1,8 @@
 const Post = require('../models/post');
 const Comment = require("../models/comment");
 
+// post routes
+
 exports.posts_list = async (req, res, next) => {
     try {
         const posts = await Post.find();
@@ -24,7 +26,7 @@ exports.create_post = (req, res, next) => {
 };
 
 exports.get_post = (req, res, next) => {
-    Post.findById(req.params.id)
+    Post.findById(req.params.postid)
         .populate('comments')
         .exec((err, post) => {
             if (err) return next(err);
@@ -35,7 +37,7 @@ exports.get_post = (req, res, next) => {
 
 exports.delete_post = async (req, res, next) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const post = await Post.findById(req.params.postid);
 
         for (const comment of post.comments) {
             try {
@@ -49,7 +51,7 @@ exports.delete_post = async (req, res, next) => {
     }
 
     try {
-        const removedPost = await Post.findByIdAndRemove(req.params.id);
+        const removedPost = await Post.findByIdAndRemove(req.params.postid);
 
         res.json(removedPost);
     } catch (err) {
@@ -57,13 +59,15 @@ exports.delete_post = async (req, res, next) => {
     }
 };
 
+// comment routes
+
 exports.comments_list = (req, res, next) => {
-    Post.findById(req.body.id)
+    Post.findById(req.params.postid)
         .populate('comments')
-        .exec((err, user) => {
+        .exec((err, post) => {
         if (err) return next(err);
 
-        res.json(user.comments);
+        res.json(post.comments);
     })
 }
 
@@ -76,10 +80,25 @@ exports.create_comment = (req, res, next) => {
     comment.save((err, comment) => {
         if (err) return next(err);
 
-        Post.findByIdAndUpdate(req.body.id, {$push: {comments: comment}}, {}, (err) => {
+        Post.findByIdAndUpdate(req.params.postid, {$push: {comments: comment}}, {}, (err) => {
             if (err) return next(err);
 
             res.json(comment);
         })
     });
 };
+
+exports.delete_comment = async (req, res, next) => {
+    try {
+        await Post.findOneAndUpdate(req.params.postid, {$pull: {comments: req.params.commentid}});
+    } catch (err) {
+        if (err) return next(err);
+    }
+
+    try {
+        const comment = await Comment.findByIdAndRemove(req.params.commentid);
+        res.json(comment);
+    } catch (e) {
+        if (e) return next(e);
+    }
+}
