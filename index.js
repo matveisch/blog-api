@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const postsRouter = require('./routes/posts');
 const userRouter = require('./routes/userRoutes');
+require('./passport');
 
 const app = express();
 
