@@ -2,7 +2,6 @@ const Post = require('../models/post');
 const Comment = require("../models/comment");
 
 // post routes
-
 exports.posts_list = async (req, res, next) => {
     try {
         const posts = await Post.find();
@@ -60,7 +59,6 @@ exports.delete_post = async (req, res, next) => {
 };
 
 // comment routes
-
 exports.comments_list = (req, res, next) => {
     Post.findById(req.params.postid)
         .populate('comments')

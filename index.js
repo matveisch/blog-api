@@ -1,12 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const postsRouter = require('./routes/posts');
+const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 const mongoDB = process.env.MONGODB_URL;
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -18,6 +21,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/posts', postsRouter);
+app.use('/user', userRouter);
 
 app.listen(4000, () => {
     console.log('app is running');
