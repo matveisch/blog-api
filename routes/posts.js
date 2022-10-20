@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const passport = require('passport');
+
 const post_controller = require('../controllers/postController');
 
 router.get('/', post_controller.posts_list);
@@ -11,6 +13,6 @@ router.post('/', post_controller.create_post);
 router.post('/:postid/comments', post_controller.create_comment);
 
 router.delete('/:postid', post_controller.delete_post);
-router.delete('/:postid/comments/:commentid', post_controller.delete_comment);
+router.delete('/:postid/comments/:commentid', passport.authenticate('jwt', {session: false}), post_controller.delete_comment);
 
 module.exports = router;
